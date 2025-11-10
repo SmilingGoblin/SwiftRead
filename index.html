@@ -1,0 +1,111 @@
+<!doctype html>
+</div>
+
+
+<div class="row">
+<label>Formatted output:</label>
+</div>
+<div id="output" class="out"></div>
+<div class="muted">Tip: tweak the strength until it feels natural. Your settings save automatically.</div>
+</div>
+</div>
+
+
+<footer>© <span id="year"></span> SwiftRead — A simple bold‑first reader.</footer>
+
+
+<script>
+const input = document.getElementById('input');
+const output = document.getElementById('output');
+const strength = document.getElementById('strength');
+const strengthVal = document.getElementById('strengthVal');
+const skipShort = document.getElementById('skipShort');
+const keepPunct = document.getElementById('keepPunct');
+const copyBtn = document.getElementById('copyBtn');
+const sampleBtn = document.getElementById('sampleBtn');
+const clearBtn = document.getElementById('clearBtn');
+
+
+const saved = JSON.parse(localStorage.getItem('sr-settings') || '{}');
+strength.value = saved.strength || 2;
+skipShort.checked = saved.skipShort !== false;
+keepPunct.checked = saved.keepPunct !== false;
+input.value = saved.lastInput || '';
+strengthVal.textContent = strength.value;
+
+
+function save() {
+localStorage.setItem('sr-settings', JSON.stringify({
+strength: parseInt(strength.value,10),
+skipShort: skipShort.checked,
+keepPunct: keepPunct.checked,
+lastInput: input.value
+}));
+}
+
+
+function splitWord(word) {
+let trail = '';
+const m = word.match(/[\p{P}\p{S}]+$/u);
+if (m) { trail = m[0]; word = word.slice(0, -trail.length); }
+const n = word.length;
+if (!n) return trail;
+if (skipShort.checked && n <= 2) return word + trail;
+const s = parseInt(strength.value,10);
+let boldCount = Math.min(s, n);
+if (n >= 6) boldCount = Math.min(s + 1, n);
+if (n >= 10) boldCount = Math.min(s + 2, n);
+const head = word.slice(0, boldCount);
+const tail = word.slice(boldCount);
+return `<b>${head}</b>${tail}${trail}`;
+}
+
+
+function formatText(txt) {
+return txt
+.split(/(\s+)/)
+.map(tok => /\s+/.test(tok) ? tok : splitWord(tok))
+.join('');
+}
+
+
+function render() {
+strengthVal.textContent = strength.value;
+output.innerHTML = formatText(input.value);
+save();
+}
+
+
+input.addEventListener('input', render);
+strength.addEventListener('input', render);
+skipShort.addEventListener('change', render);
+keepPunct.addEventListener('change', render);
+
+
+copyBtn.addEventListener('click', async () => {
+const blob = new Blob([output.innerHTML], { type: 'text/html' });
+await navigator.clipboard.write([new ClipboardItem({ 'text/html': blob })]).catch(async () => {
+await navigator.clipboard.writeText(output.innerText);
+});
+copyBtn.textContent = 'Copied!';
+setTimeout(() => copyBtn.textContent = 'Copy Output', 1200);
+});
+
+
+sampleBtn.addEventListener('click', () => {
+input.value = `Reading can feel heavy. Bold‑first text gives your eyes a small anchor at the start of each word. Try different strengths and see what clicks.`;
+render();
+});
+
+
+clearBtn.addEventListener('click', () => {
+input.value = '';
+render();
+});
+
+
+document.getElementById('year').textContent = new Date().getFullYear();
+render();
+</script>
+</body>
+</html>
