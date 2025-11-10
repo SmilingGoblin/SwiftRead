@@ -1,4 +1,62 @@
 <!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SwiftRead — Bold‑First Reading</title>
+<style>
+:root { --bg:#0f172a; --panel:#111827; --text:#e5e7eb; --muted:#9ca3af; }
+* { box-sizing: border-box; }
+body { margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; background:var(--bg); color:var(--text); }
+header { padding:16px 20px; display:flex; align-items:center; justify-content:space-between; }
+.brand { font-weight:800; letter-spacing:0.2px; }
+.wrap { max-width:900px; margin:0 auto; padding:20px; }
+.card { background:var(--panel); border:1px solid #1f2937; border-radius:16px; padding:16px; box-shadow: 0 10px 30px rgba(0,0,0,.25); }
+textarea { width:100%; min-height:160px; background:#0b1220; color:var(--text); border:1px solid #1f2937; border-radius:12px; padding:12px; font-size:16px; line-height:1.5; }
+.controls { display:grid; grid-template-columns: 1fr; gap:12px; margin:12px 0; }
+.row { display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
+.row label { color:var(--muted); font-size:14px; }
+.out { background:#0b1220; border:1px solid #1f2937; border-radius:12px; padding:16px; min-height:160px; line-height:1.7; font-size:18px; }
+.btn { background:#2563eb; color:white; border:none; padding:10px 14px; border-radius:10px; font-weight:600; cursor:pointer; }
+.btn.ghost { background:transparent; border:1px solid #374151; color:#e5e7eb; }
+.muted { color:var(--muted); font-size:13px; }
+footer { text-align:center; color:var(--muted); padding:28px 0; font-size:13px; }
+@media (min-width: 720px) { .controls { grid-template-columns: 1fr 1fr; } }
+b { font-weight: 800; }
+</style>
+</head>
+<body>
+<header>
+<div class="brand">SwiftRead</div>
+<button id="copyBtn" class="btn ghost">Copy Output</button>
+</header>
+
+
+<div class="wrap">
+<div class="card">
+<div class="row">
+<label>Paste your text below:</label>
+</div>
+<textarea id="input" placeholder="Paste or type here…"></textarea>
+
+
+<div class="controls">
+<div class="row">
+<label>Bold strength: <span id="strengthVal">2</span></label>
+<input type="range" id="strength" min="1" max="4" step="1" value="2" />
+</div>
+<div class="row">
+<label>Skip short words</label>
+<input type="checkbox" id="skipShort" checked />
+</div>
+<div class="row">
+<label>Keep punctuation</label>
+<input type="checkbox" id="keepPunct" checked />
+</div>
+<div class="row">
+<button id="sampleBtn" class="btn">Load Sample</button>
+<button id="clearBtn" class="btn ghost">Clear</button>
+</div>
 </div>
 
 
@@ -12,8 +70,6 @@
 
 
 <footer>© <span id="year"></span> SwiftRead — A simple bold‑first reader.</footer>
-
-
 <script>
 const input = document.getElementById('input');
 const output = document.getElementById('output');
